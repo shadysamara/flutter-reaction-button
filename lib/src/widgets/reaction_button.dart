@@ -26,7 +26,9 @@ class ReactionButton<T> extends StatefulWidget {
     this.hoverDuration = const Duration(milliseconds: 400),
     this.child,
     this.direction = ReactionsBoxAlignment.ltr,
+    this.offsetValue = 0,
   }) : _type = child != null ? ReactionType.container : ReactionType.button;
+  final double offsetValue;
 
   /// This triggers when reaction button value changed.
   final ValueChanged<Reaction<T>?> onReactionChanged;
@@ -122,7 +124,8 @@ class _ReactionButtonState<T> extends State<ReactionButton<T>> {
 
     // Adjust the offset to position the popup above the button
     // You can tweak the value 80 to control the distance between the button and the popup
-    Offset newOffset = Offset(buttonPosition.dx, buttonPosition.dy - 80);
+    Offset newOffset =
+        Offset(buttonPosition.dx, buttonPosition.dy - widget.offsetValue);
 
     _overlayEntry = OverlayEntry(
       builder: (context) {
