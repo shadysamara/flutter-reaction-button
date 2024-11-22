@@ -26,10 +26,7 @@ class ReactionButton<T> extends StatefulWidget {
     this.hoverDuration = const Duration(milliseconds: 400),
     this.child,
     this.direction = ReactionsBoxAlignment.ltr,
-    this.boxOffset,
   }) : _type = child != null ? ReactionType.container : ReactionType.button;
-
-  final Offset? boxOffset;
 
   /// This triggers when reaction button value changed.
   final ValueChanged<Reaction<T>?> onReactionChanged;
@@ -118,29 +115,37 @@ class _ReactionButtonState<T> extends State<ReactionButton<T>> {
   }
 
   void _onShowReactionsBox([Offset? offset]) {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    Offset buttonPosition = renderBox.localToGlobal(Offset.zero);
+    double buttonHeight = renderBox.size.height;
     _overlayEntry = OverlayEntry(
       builder: (context) {
-        return ReactionsBox<T>(
-          offset: widget.boxOffset ?? _globalKey.offset,
-          itemSize: widget.itemSize,
-          reactions: widget.reactions,
-          color: widget.boxColor,
-          elevation: widget.boxElevation,
-          radius: widget.boxRadius,
-          boxDuration: widget.boxAnimationDuration,
-          boxPadding: widget.boxPadding,
-          itemSpace: widget.itemsSpacing,
-          itemScale: widget.itemScale,
-          itemScaleDuration: widget.itemAnimationDuration,
-          animateBox: widget.animateBox,
-          direction: widget.direction,
-          onReactionSelected: (reaction) {
-            _updateReaction(reaction);
-            _disposeOverlayEntry();
-          },
-          onClose: () {
-            _disposeOverlayEntry();
-          },
+        return Positioned(
+          top: buttonPosition.dy -
+              80, // Adjust this to control the space above the button
+          left: buttonPosition.dx,
+          child: ReactionsBox<T>(
+            offset: offset ?? _globalKey.offset,
+            itemSize: widget.itemSize,
+            reactions: widget.reactions,
+            color: widget.boxColor,
+            elevation: widget.boxElevation,
+            radius: widget.boxRadius,
+            boxDuration: widget.boxAnimationDuration,
+            boxPadding: widget.boxPadding,
+            itemSpace: widget.itemsSpacing,
+            itemScale: widget.itemScale,
+            itemScaleDuration: widget.itemAnimationDuration,
+            animateBox: widget.animateBox,
+            direction: widget.direction,
+            onReactionSelected: (reaction) {
+              _updateReaction(reaction);
+              _disposeOverlayEntry();
+            },
+            onClose: () {
+              _disposeOverlayEntry();
+            },
+          ),
         );
       },
     );
@@ -173,12 +178,12 @@ class _ReactionButtonState<T> extends State<ReactionButton<T>> {
         if (widget.toggle) {
           _onCheck();
         } else {
-          _onShowReactionsBox(widget.boxOffset);
+          _onShowReactionsBox();
         }
       },
       onLongPressStart: (details) {
         if (widget.toggle) {
-          _onShowReactionsBox(widget.boxOffset);
+          _onShowReactionsBox(_isContainer ? details.globalPosition : null);
         }
       },
       child: child,
