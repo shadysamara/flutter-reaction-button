@@ -115,37 +115,38 @@ class _ReactionButtonState<T> extends State<ReactionButton<T>> {
   }
 
   void _onShowReactionsBox([Offset? offset]) {
-    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    // Get the button's position in the screen coordinates
+    RenderBox renderBox =
+        _globalKey.currentContext!.findRenderObject() as RenderBox;
     Offset buttonPosition = renderBox.localToGlobal(Offset.zero);
-    double buttonHeight = renderBox.size.height;
+
+    // Adjust the offset to position the popup above the button
+    // You can tweak the value 80 to control the distance between the button and the popup
+    Offset newOffset = Offset(buttonPosition.dx, buttonPosition.dy - 80);
+
     _overlayEntry = OverlayEntry(
       builder: (context) {
-        return Positioned(
-          top: buttonPosition.dy -
-              80, // Adjust this to control the space above the button
-          left: buttonPosition.dx,
-          child: ReactionsBox<T>(
-            offset: offset ?? _globalKey.offset,
-            itemSize: widget.itemSize,
-            reactions: widget.reactions,
-            color: widget.boxColor,
-            elevation: widget.boxElevation,
-            radius: widget.boxRadius,
-            boxDuration: widget.boxAnimationDuration,
-            boxPadding: widget.boxPadding,
-            itemSpace: widget.itemsSpacing,
-            itemScale: widget.itemScale,
-            itemScaleDuration: widget.itemAnimationDuration,
-            animateBox: widget.animateBox,
-            direction: widget.direction,
-            onReactionSelected: (reaction) {
-              _updateReaction(reaction);
-              _disposeOverlayEntry();
-            },
-            onClose: () {
-              _disposeOverlayEntry();
-            },
-          ),
+        return ReactionsBox<T>(
+          offset: newOffset,
+          itemSize: widget.itemSize,
+          reactions: widget.reactions,
+          color: widget.boxColor,
+          elevation: widget.boxElevation,
+          radius: widget.boxRadius,
+          boxDuration: widget.boxAnimationDuration,
+          boxPadding: widget.boxPadding,
+          itemSpace: widget.itemsSpacing,
+          itemScale: widget.itemScale,
+          itemScaleDuration: widget.itemAnimationDuration,
+          animateBox: widget.animateBox,
+          direction: widget.direction,
+          onReactionSelected: (reaction) {
+            _updateReaction(reaction);
+            _disposeOverlayEntry();
+          },
+          onClose: () {
+            _disposeOverlayEntry();
+          },
         );
       },
     );
