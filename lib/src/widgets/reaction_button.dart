@@ -26,7 +26,10 @@ class ReactionButton<T> extends StatefulWidget {
     this.hoverDuration = const Duration(milliseconds: 400),
     this.child,
     this.direction = ReactionsBoxAlignment.ltr,
+    this.boxOffset,
   }) : _type = child != null ? ReactionType.container : ReactionType.button;
+
+  final Offset? boxOffset;
 
   /// This triggers when reaction button value changed.
   final ValueChanged<Reaction<T>?> onReactionChanged;
@@ -118,7 +121,7 @@ class _ReactionButtonState<T> extends State<ReactionButton<T>> {
     _overlayEntry = OverlayEntry(
       builder: (context) {
         return ReactionsBox<T>(
-          offset: offset ?? _globalKey.offset,
+          offset: widget.boxOffset ?? _globalKey.offset,
           itemSize: widget.itemSize,
           reactions: widget.reactions,
           color: widget.boxColor,
@@ -170,12 +173,12 @@ class _ReactionButtonState<T> extends State<ReactionButton<T>> {
         if (widget.toggle) {
           _onCheck();
         } else {
-          _onShowReactionsBox();
+          _onShowReactionsBox(widget.boxOffset);
         }
       },
       onLongPressStart: (details) {
         if (widget.toggle) {
-          _onShowReactionsBox(_isContainer ? details.globalPosition : null);
+          _onShowReactionsBox(widget.boxOffset);
         }
       },
       child: child,
